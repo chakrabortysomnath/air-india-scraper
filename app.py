@@ -98,6 +98,11 @@ def run_scraper(job: dict):
                     "--no-sandbox",
                     "--disable-dev-shm-usage",
                     "--disable-blink-features=AutomationControlled",
+                    "--disable-infobars",
+                    "--disable-extensions",
+                    "--disable-gpu",
+                    "--window-size=1366,768",
+                    "--ignore-certificate-errors",
                 ],
             )
             ctx = browser.new_context(
@@ -108,12 +113,18 @@ def run_scraper(job: dict):
                     "Chrome/123.0.0.0 Safari/537.36"
                 ),
                 locale="en-IN",
+                timezone_id="Asia/Kolkata",
+                extra_http_headers={
+                    "Accept-Language": "en-IN,en;q=0.9",
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                },
             )
+            # Hide webdriver property from JS detection
+            ctx.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
             page = ctx.new_page()
 
-            log("Opening Air India homepage…")
-            page.goto("https://www.airindia.com/in/en.html", timeout=30000)
-            time.sleep(3)
+            log("Warming up browser…")
+            time.sleep(2)
 
             for dep in out_dates:
                 for ret in ret_dates:
