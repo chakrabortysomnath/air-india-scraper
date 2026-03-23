@@ -16,6 +16,10 @@ from datetime import date, timedelta
 
 
 # ── Install Playwright browsers at startup (needed on Streamlit Cloud / Render) ──
+# ── Page config — MUST be first Streamlit command ─────────────────────────────
+st.set_page_config(page_title="Air India Fare Finder", page_icon="✈️", layout="centered")
+
+
 @st.cache_resource
 def install_playwright():
     """Runs once per server start. Installs Chromium if not already present."""
@@ -203,8 +207,6 @@ def build_excel(results: list) -> bytes:
     return buf.getvalue()
 
 
-# ── Page config ────────────────────────────────────────────────────────────────
-st.set_page_config(page_title="Air India Fare Finder", page_icon="✈️", layout="centered")
 st.title("✈️ Air India Fare Finder")
 st.caption("Round-trip fare search across a date range — exports to Excel.")
 
