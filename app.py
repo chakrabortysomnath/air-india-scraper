@@ -223,26 +223,13 @@ for key, default in {
     if key not in st.session_state:
         st.session_state[key] = default
 
-COMMON_ROUTES = {
-    "Kolkata (CCU) → Delhi (DEL)":      ("CCU", "DEL"),
-    "Kolkata (CCU) → Mumbai (BOM)":     ("CCU", "BOM"),
-    "Kolkata (CCU) → Bangalore (BLR)":  ("CCU", "BLR"),
-    "Delhi (DEL) → Mumbai (BOM)":       ("DEL", "BOM"),
-    "Mumbai (BOM) → Goa (GOI)":         ("BOM", "GOI"),
-    "Custom…": None,
-}
-
 # ── Input form ─────────────────────────────────────────────────────────────────
 with st.form("search_form"):
     st.subheader("Route")
-    route_choice = st.selectbox("Select a route", list(COMMON_ROUTES.keys()))
-    if COMMON_ROUTES[route_choice] is None:
-        c1, c2 = st.columns(2)
-        origin      = c1.text_input("Origin IATA",      value="CCU").upper().strip()
-        destination = c2.text_input("Destination IATA", value="DEL").upper().strip()
-    else:
-        origin, destination = COMMON_ROUTES[route_choice]
-        st.info(f"**{origin}** → **{destination}**")
+    st.caption("Enter 3-letter IATA airport codes. Examples: CCU (Kolkata), DEL (Delhi), BOM (Mumbai), BLR (Bengaluru), MAA (Chennai), HYD (Hyderabad), GOI (Goa)")
+    c1, c2 = st.columns(2)
+    origin      = c1.text_input("Origin airport code",      value="CCU", max_chars=3, placeholder="e.g. CCU").upper().strip()
+    destination = c2.text_input("Destination airport code", value="DEL", max_chars=3, placeholder="e.g. DEL").upper().strip()
 
     st.subheader("Outbound dates")
     c3, c4 = st.columns(2)
@@ -259,6 +246,12 @@ with st.form("search_form"):
 
 # ── On submit ──────────────────────────────────────────────────────────────────
 if submitted:
+    if len(origin) != 3 or len(destination) != 3:
+        st.error("Please enter valid 3-letter IATA codes for both origin and destination (e.g. CCU, DEL, BOM).")
+        st.stop()
+    if origin == destination:
+        st.error("Origin and destination cannot be the same.")
+        st.stop()
     if out_end < out_start:
         st.error("Outbound end must be after outbound start.")
         st.stop()
